@@ -1,0 +1,29 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "L5 OpenApi",
+        "description": "L5 Swagger OpenApi description",
+        "contact": {
+            "name": "mohammad eshaghi",
+            "url": "https://backendcast.ir",
+            "email": "mohammadeshaghi1998@gmail.com"
+        },
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/hi": {
+            "get": {
+                "tags": [
+                    "Home"
+                ],
+                "description": "Home page",
+                "operationId": "c4f2b4143fcab009e2345f024bb9fbf3",
+                "responses": {
+                    "200": {
+                        "description": "An example resource"
+                    }
+                }
+            }
+        }
+    }
+}
