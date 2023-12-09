@@ -17,10 +17,30 @@
                     "Home"
                 ],
                 "description": "Home page",
-                "operationId": "c4f2b4143fcab009e2345f024bb9fbf3",
+                "operationId": "d3db3a6ae4805a610b75565e73873391",
                 "responses": {
                     "200": {
-                        "description": "An example resource"
+                        "description": "An example resource",
+                        "content": {
+                            "application/json": {}
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "description": "Get user info",
+                "operationId": "d7b1f02dbb78f649c378842b76ede730",
+                "responses": {
+                    "200": {
+                        "description": "An example resource",
+                        "content": {
+                            "application/json": {}
+                        }
                     }
                 }
             }

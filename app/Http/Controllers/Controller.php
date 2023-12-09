@@ -28,7 +28,32 @@ class Controller extends BaseController
      *     path="/api/hi",
      *     description="Home page",
      *     tags={"Home"},
-     *     @OA\Response(response="200", description="An example resource")
+     *     @OA\Response(
+     *          response="200",
+     *          description="An example resource",
+     *          @OA\MediaType(
+     *              mediaType="application/json",
+     *          )
+     *      )
+     * )
+     */
+    public function index1()
+    {
+        return response()->json(['hi' => 'hi']);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/user",
+     *     description="Get user info",
+     *     tags={"User"},
+     *      @OA\Response(
+     *           response="200",
+     *           description="An example resource",
+     *           @OA\MediaType(
+     *               mediaType="application/json",
+     *           )
+     *       )
      * )
      */
 

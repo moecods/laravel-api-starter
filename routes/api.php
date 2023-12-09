@@ -19,5 +19,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/hi', function () {
+    $user = \App\Models\User::factory()->create();
+    \Illuminate\Support\Facades\Auth::loginUsingId($user->id);
     return response()->json(['hi' => 'hi']);
 });
