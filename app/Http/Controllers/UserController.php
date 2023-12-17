@@ -2,48 +2,96 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Repositories\UserRepo;
+use App\Traits\ResponseTrait;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
+    use ResponseTrait;
+
+    private UserRepo $userRepo;
+
+    public function __construct(UserRepo $userRepo) {
+        $this->userRepo = $userRepo;
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Display a listing of the user.
      */
-    public function store(Request $request)
+    public function index(Request $request): JsonResponse
     {
-        //
+        $request->validate([
+            'per_page' => 'nullable'
+        ]);
+
+        $perPage = request('per_page') ?? 10;
+
+        $users = $this->userRepo->paginate($perPage);
+        return $this->successResponse($users);
     }
 
     /**
-     * Display the specified resource.
+     * Store a newly created user in storage.
      */
-    public function show(User $user)
+    public function store(Request $request): JsonResponse
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|string|min:8',
+        ]);
+
+        $user = $this->userRepo->create($validated);
+        return $this->successResponse($user);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Display the specified user.
      */
-    public function update(Request $request, User $user)
+    public function show($id): JsonResponse
     {
-        //
+        $user = $this->userRepo->findOrNull($id);
+
+        if (is_null($user)) {
+            return $this->errorResponse('User not found', 404);
+        }
+
+        return $this->successResponse($user);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Update the specified user in storage.
      */
-    public function destroy(User $user)
+    public function update(Request $request, int $id): JsonResponse
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|string|min:8',
+        ]);
+
+        $isUpdated = $this->userRepo->update($id,  $validated);
+
+        if (!$isUpdated) {
+            return $this->errorResponse('User not Updated', 404);
+        }
+
+        return $this->show($id);
+    }
+
+    /**
+     * Remove the specified user from storage.
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        $deletedUser = $this->userRepo->delete($id);
+
+        if (!$deletedUser) {
+            return $this->errorResponse('User not Deleted', 404);
+        }
+
+        return $this->successResponse('User Deleted Successfully', 200);
     }
 }
