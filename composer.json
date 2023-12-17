@@ -6,15 +6,17 @@
     "license": "MIT",
     "require": {
         "php": "^8.1",
-        "darkaonline/l5-swagger": "^8.5",
+        "dedoc/scramble": "^0.8.5",
+        "doctrine/dbal": "^3.7",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8"
     },
     "require-dev": {
+        "composer/composer": "^2.6",
         "fakerphp/faker": "^1.9.1",
-        "laravel/pint": "^1.0",
+        "laravel/pint": "^1.13",
         "laravel/sail": "^1.18",
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^7.0",

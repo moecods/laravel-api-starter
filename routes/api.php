@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,8 +19,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/hi', function () {
-    $user = \App\Models\User::factory()->create();
-    \Illuminate\Support\Facades\Auth::loginUsingId($user->id);
-    return response()->json(['hi' => 'hi']);
+Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::post('/register', [AuthController::class, 'register'])->name('register');
+
+Route::middleware('auth:sanctum')->group(function () {
+   Route::get('/me', [AuthController::class, 'me'])->name('me');
 });

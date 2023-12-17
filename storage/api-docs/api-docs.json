@@ -11,35 +11,69 @@
         "version": "1.0.0"
     },
     "paths": {
-        "/api/hi": {
-            "get": {
+        "/api/login": {
+            "post": {
                 "tags": [
-                    "Home"
+                    "Authentication"
                 ],
-                "description": "Home page",
-                "operationId": "d3db3a6ae4805a610b75565e73873391",
-                "responses": {
-                    "200": {
-                        "description": "An example resource",
-                        "content": {
-                            "application/json": {}
+                "description": "Login endpoint",
+                "operationId": "51c59563067b624ad4524d9b59c3dab4",
+                "requestBody": {
+                    "description": "Login data",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "description": "User's email",
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "description": "User's password",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
                         }
                     }
-                }
-            }
-        },
-        "/api/user": {
-            "get": {
-                "tags": [
-                    "User"
-                ],
-                "description": "Get user info",
-                "operationId": "d7b1f02dbb78f649c378842b76ede730",
+                },
                 "responses": {
                     "200": {
-                        "description": "An example resource",
+                        "description": "Successful login",
                         "content": {
-                            "application/json": {}
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "access_token": {
+                                            "description": "Access token for the logged in user",
+                                            "type": "string"
+                                        },
+                                        "token_type": {
+                                            "description": "Type of the token",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "description": "Error message",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
                         }
                     }
                 }

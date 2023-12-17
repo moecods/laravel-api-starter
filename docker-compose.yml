@@ -9,7 +9,7 @@ services:
         container_name: laravel_php
         build: .docker/php
         ports:
-            - 5173:6050
+            - "6050:5173"
         volumes:
             - .:/var/www:cached
 
@@ -20,7 +20,7 @@ services:
         container_name: laravel_nginx
         image: nginx
         ports:
-            - 80:6051
+            - "6051:80"
         volumes:
             - .:/var/www
             - .docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
@@ -35,7 +35,7 @@ services:
         container_name: laravel_mysql
         image: mysql:8.1
         ports:
-            - 3306:6052
+            - "6052:3306"
         volumes:
             - .docker/db/data:/var/lib/mysql
             - .docker/logs:/var/log/mysql
@@ -73,5 +73,5 @@ services:
         container_name: laravel_mailpit
         image: axllent/mailpit:latest
         ports:
-        - 8025:8025
-        - 1025:1025
+        - "8025:8025"
+        - "1025:1025"
