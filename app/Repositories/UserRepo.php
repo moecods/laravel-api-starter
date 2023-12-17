@@ -14,6 +14,7 @@ class UserRepo extends BaseRepository
     public function create(array $data): mixed
     {
         $data['password'] = bcrypt($data['password']);
+
         return parent::create($data);
     }
 

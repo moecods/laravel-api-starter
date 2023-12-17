@@ -14,7 +14,6 @@ class BaseRepository
     /**
      * Create a new instance.
      *
-     * @param Model $model
      * @return void
      */
     public function __construct(Model $model)
@@ -25,8 +24,7 @@ class BaseRepository
     /**
      * Retrieve all data of repository.
      *
-     * @param array $columns
-     * @return mixed
+     * @param  array  $columns
      */
     public function all($columns = ['*']): mixed
     {
@@ -36,9 +34,8 @@ class BaseRepository
     /**
      * Retrieve all data of repository, paginated.
      *
-     * @param null $limit
-     * @param array $columns
-     * @return mixed
+     * @param  null  $limit
+     * @param  array  $columns
      */
     public function paginate($limit = null, $columns = ['*']): mixed
     {
@@ -47,9 +44,6 @@ class BaseRepository
 
     /**
      * Save a new entity in repository.
-     *
-     * @param array $data
-     * @return mixed
      */
     public function create(array $data): mixed
     {
@@ -58,9 +52,6 @@ class BaseRepository
 
     /**
      * Return an entity.
-     *
-     * @param int $id
-     * @return mixed
      */
     public function findOrNull(int $id): mixed
     {
@@ -69,10 +60,6 @@ class BaseRepository
 
     /**
      * Update an entity.
-     *
-     * @param int $id
-     * @param array $data
-     * @return bool
      */
     public function update(int $id, array $data): bool
     {
@@ -87,11 +74,8 @@ class BaseRepository
 
     /**
      * Delete an entity.
-     *
-     * @param int $id
-     * @return bool|null
      */
-    public function delete(int $id): bool|null
+    public function delete(int $id): ?bool
     {
         $entity = $this->findOrNull($id);
 
@@ -104,10 +88,6 @@ class BaseRepository
 
     /**
      * Update or create an entity.
-     *
-     * @param array $attributes
-     * @param array $values
-     * @return mixed
      */
     public function updateOrCreate(array $attributes, array $values): mixed
     {
@@ -116,10 +96,6 @@ class BaseRepository
 
     /**
      * Get entity.
-     *
-     * @param array $condition
-     * @param bool $takeOne
-     * @return mixed
      */
     public function get(array $condition = [], bool $takeOne = true): mixed
     {

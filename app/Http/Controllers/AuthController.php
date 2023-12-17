@@ -18,17 +18,19 @@ class AuthController extends Controller
             'email' => 'required|email',
             'password' => 'required|min:8',
         ]);
-        if (!auth()->attempt($credentials)) {
+        if (! auth()->attempt($credentials)) {
             return $this->errorResponse(['message' => 'Unauthorized'], 401);
         }
         $user = auth()->user();
         $token = $user->createToken('auth_token')->plainTextToken;
+
         return $this->successResponse(['access_token' => $token, 'token_type' => 'Bearer']);
     }
 
     public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
+
         return $this->successResponse(['message' => 'Logged out']);
     }
 
@@ -48,6 +50,7 @@ class AuthController extends Controller
         $validated['password'] = bcrypt($validated['password']);
         $user = User::query()->create($validated);
         $token = $user->createToken('auth_token')->plainTextToken;
+
         return $this->successResponse(['access_token' => $token, 'token_type' => 'Bearer']);
     }
 
@@ -56,6 +59,7 @@ class AuthController extends Controller
         $user = $request->user();
         $user->tokens()->delete();
         $token = $user->createToken('auth_token')->plainTextToken;
+
         return $this->successResponse(['access_token' => $token, 'token_type' => 'Bearer']);
     }
 }

@@ -13,7 +13,8 @@ class UserController extends Controller
 
     private UserRepo $userRepo;
 
-    public function __construct(UserRepo $userRepo) {
+    public function __construct(UserRepo $userRepo)
+    {
         $this->userRepo = $userRepo;
     }
 
@@ -23,12 +24,13 @@ class UserController extends Controller
     public function index(Request $request): JsonResponse
     {
         $request->validate([
-            'per_page' => 'nullable'
+            'per_page' => 'nullable',
         ]);
 
         $perPage = request('per_page') ?? 10;
 
         $users = $this->userRepo->paginate($perPage);
+
         return $this->successResponse($users);
     }
 
@@ -44,6 +46,7 @@ class UserController extends Controller
         ]);
 
         $user = $this->userRepo->create($validated);
+
         return $this->successResponse($user);
     }
 
@@ -72,9 +75,9 @@ class UserController extends Controller
             'password' => 'required|string|min:8',
         ]);
 
-        $isUpdated = $this->userRepo->update($id,  $validated);
+        $isUpdated = $this->userRepo->update($id, $validated);
 
-        if (!$isUpdated) {
+        if (! $isUpdated) {
             return $this->errorResponse('User not Updated', 404);
         }
 
@@ -88,7 +91,7 @@ class UserController extends Controller
     {
         $deletedUser = $this->userRepo->delete($id);
 
-        if (!$deletedUser) {
+        if (! $deletedUser) {
             return $this->errorResponse('User not Deleted', 404);
         }
 
