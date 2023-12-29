@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Repositories\UserRepo;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\JsonResponse;
@@ -20,6 +21,7 @@ class UserController extends Controller
 
     /**
      * Display a listing of the user.
+     * @return JsonResponse<User, 200>
      */
     public function index(Request $request): JsonResponse
     {
