@@ -2,20 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
-use App\Http\Requests;
-use Prettus\Validator\Contracts\ValidatorInterface;
-use Prettus\Validator\Exceptions\ValidatorException;
 use App\Http\Requests\PostCreateRequest;
 use App\Http\Requests\PostUpdateRequest;
 use App\Repositories\PostRepository;
 use App\Validators\PostValidator;
+use Prettus\Validator\Contracts\ValidatorInterface;
+use Prettus\Validator\Exceptions\ValidatorException;
 
 /**
  * Class PostsController.
- *
- * @package namespace App\Http\Controllers;
  */
 class PostsController extends Controller
 {
@@ -31,14 +26,11 @@ class PostsController extends Controller
 
     /**
      * PostsController constructor.
-     *
-     * @param PostRepository $repository
-     * @param PostValidator $validator
      */
     public function __construct(PostRepository $repository, PostValidator $validator)
     {
         $this->repository = $repository;
-        $this->validator  = $validator;
+        $this->validator = $validator;
     }
 
     /**
@@ -64,7 +56,6 @@ class PostsController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  PostCreateRequest $request
      *
      * @return \Illuminate\Http\Response
      *
@@ -80,7 +71,7 @@ class PostsController extends Controller
 
             $response = [
                 'message' => 'Post created.',
-                'data'    => $post->toArray(),
+                'data' => $post->toArray(),
             ];
 
             if ($request->wantsJson()) {
@@ -92,8 +83,8 @@ class PostsController extends Controller
         } catch (ValidatorException $e) {
             if ($request->wantsJson()) {
                 return response()->json([
-                    'error'   => true,
-                    'message' => $e->getMessageBag()
+                    'error' => true,
+                    'message' => $e->getMessageBag(),
                 ]);
             }
 
@@ -104,8 +95,7 @@ class PostsController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int $id
-     *
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -125,8 +115,7 @@ class PostsController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int $id
-     *
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -139,9 +128,7 @@ class PostsController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  PostUpdateRequest $request
-     * @param  string            $id
-     *
+     * @param  string  $id
      * @return Response
      *
      * @throws \Prettus\Validator\Exceptions\ValidatorException
@@ -156,7 +143,7 @@ class PostsController extends Controller
 
             $response = [
                 'message' => 'Post updated.',
-                'data'    => $post->toArray(),
+                'data' => $post->toArray(),
             ];
 
             if ($request->wantsJson()) {
@@ -170,8 +157,8 @@ class PostsController extends Controller
             if ($request->wantsJson()) {
 
                 return response()->json([
-                    'error'   => true,
-                    'message' => $e->getMessageBag()
+                    'error' => true,
+                    'message' => $e->getMessageBag(),
                 ]);
             }
 
@@ -179,12 +166,10 @@ class PostsController extends Controller
         }
     }
 
-
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int $id
-     *
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)

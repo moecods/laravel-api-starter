@@ -21,6 +21,7 @@ class UserController extends Controller
 
     /**
      * Display a listing of the user.
+     *
      * @return JsonResponse<User, 200>
      */
     public function index(Request $request): JsonResponse

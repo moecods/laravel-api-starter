@@ -8,28 +8,27 @@ use App\Traits\ResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Spatie\Permission\Contracts\Permission;
 
 class RoleController extends Controller
 {
-    /**
-     *
-     */
     use ResponseTrait;
 
     protected RoleRepository $repository;
 
-    public function __construct(RoleRepository $repository){
+    public function __construct(RoleRepository $repository)
+    {
         $this->repository = $repository;
     }
 
     /**
      * Display a listing of the resource.
+     *
      * @return JsonResponse<Role, 200>
      */
     public function index(): JsonResponse
     {
         $roles = $this->repository->orderBy('id', 'desc')->paginate();
+
         return $this->successResponse($roles->load('permissions'));
     }
 
@@ -43,19 +42,19 @@ class RoleController extends Controller
                 'required',
                 'string',
                 'max:100',
-                Rule::unique(config('permission.table_names')['roles'], 'name')
+                Rule::unique(config('permission.table_names')['roles'], 'name'),
             ],
             'permissions' => 'nullable|array',
             'permissions.*' => [
                 'int',
                 'min:1',
-                Rule::exists(config('permission.table_names')['permissions'], 'id')
+                Rule::exists(config('permission.table_names')['permissions'], 'id'),
             ],
         ]);
 
-
         $role = $this->repository->create($validated);
         $role->givePermissionTo($validated['permissions']);
+
         return $this->successResponse($role->load('permissions'));
     }
 
@@ -71,12 +70,13 @@ class RoleController extends Controller
             'permissions.*' => [
                 'int',
                 'min:1',
-                Rule::exists(config('permission.table_names')['permissions'], 'id')
+                Rule::exists(config('permission.table_names')['permissions'], 'id'),
             ],
         ]);
 
         $role = $this->repository->update($validated, $id);
         $role->syncPermissions($validated['permissions']);
+
         return $this->successResponse($role->load('permissions'));
     }
 
@@ -87,7 +87,7 @@ class RoleController extends Controller
     {
         $role = $this->repository->find($id);
 
-        if (!$role) {
+        if (! $role) {
             return response()->json(['error' => 'Role not found'], 404);
         }
 
@@ -103,6 +103,7 @@ class RoleController extends Controller
 
         try {
             $this->repository->delete($id);
+
             return $this->successResponse($role);
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage(), 500);

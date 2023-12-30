@@ -7,8 +7,6 @@ use Prettus\Repository\Presenter\FractalPresenter;
 
 /**
  * Class PostPresenter.
- *
- * @package namespace App\Presenters;
  */
 class PostPresenter extends FractalPresenter
 {
