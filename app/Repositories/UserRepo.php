@@ -18,6 +18,17 @@ class UserRepo extends BaseRepository
         return parent::create($data);
     }
 
+    public function findOrCreate(array $data): mixed
+    {
+        $user = $this->model->where('email', $data['email'])->first();
+
+        if ($user) {
+            return $user;
+        }
+
+        return $this->create($data);
+    }
+
     public function update(int $id, array $data): bool
     {
         if (isset($data['password'])) {
