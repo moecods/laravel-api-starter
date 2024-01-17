@@ -2,7 +2,6 @@
 
 namespace App\Exceptions;
 
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Essa\APIToolKit\Exceptions\Handler as APIHandler;
 use Throwable;
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\PostController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -50,3 +51,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('roles', RoleController::class)->except('show');
 });
+
+/*===========================
+=           posts           =
+=============================*/
+
+Route::apiResource('/posts', PostController::class);
+
+/*=====  End of posts   ======*/

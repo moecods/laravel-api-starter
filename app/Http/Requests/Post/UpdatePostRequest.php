@@ -9,7 +9,8 @@ class UpdatePostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            
+            'title' => 'string|min:1|max:255',
+            'content' => 'string|min:1',
         ];
     }
 }

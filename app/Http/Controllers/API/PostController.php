@@ -3,22 +3,35 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Post\UpdatePostRequest;
 use App\Http\Requests\Post\CreatePostRequest;
+use App\Http\Requests\Post\UpdatePostRequest;
 use App\Http\Resources\Post\PostResource;
 use App\Models\Post;
+use Essa\APIToolKit\Api\ApiResponse;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
+    use ApiResponse;
+
     public function __construct()
     {
 
     }
 
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request)
     {
+        $request->validate([
+            'pagination' => 'in:none',
+            'per_page' => 'integer|min:1',
+            'search' => 'string',
+            /**
+             * @example -created_at, created_at
+             */
+            'sorts' => 'string',
+        ]);
+
         $posts = Post::useFilters()->dynamicPaginate();
 
         return PostResource::collection($posts);
@@ -49,6 +62,4 @@ class PostController extends Controller
 
         return $this->responseDeleted();
     }
-
-   
 }

@@ -7,10 +7,9 @@ use Essa\APIToolKit\Filters\Filterable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-
 class Post extends Model
 {
-    use HasFactory, Filterable;
+    use Filterable, HasFactory;
 
     protected string $default_filters = PostFilters::class;
 
@@ -20,8 +19,7 @@ class Post extends Model
      * @var array
      */
     protected $fillable = [
-        
+        'title',
+        'content',
     ];
-
-
 }

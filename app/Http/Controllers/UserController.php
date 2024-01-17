@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Repositories\UserRepo;
-use App\Traits\ResponseTrait;
+use Essa\APIToolKit\Api\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    use ResponseTrait;
+    use ApiResponse;
 
     private UserRepo $userRepo;
 
@@ -27,14 +27,13 @@ class UserController extends Controller
     public function index(Request $request): JsonResponse
     {
         $request->validate([
-            'per_page' => 'nullable',
+            'pagination' => 'in:none',
+            'per_page' => 'integer|min:1',
         ]);
 
-        $perPage = request('per_page') ?? 10;
+        $users = User::dynamicPaginate();
 
-        $users = $this->userRepo->paginate($perPage);
-
-        return $this->successResponse($users);
+        return $this->responseSuccess('Show users successfully', $users);
     }
 
     /**
@@ -50,7 +49,7 @@ class UserController extends Controller
 
         $user = $this->userRepo->create($validated);
 
-        return $this->successResponse($user);
+        return $this->responseSuccess('User created successfully', $user);
     }
 
     /**
@@ -58,7 +57,7 @@ class UserController extends Controller
      */
     public function show(User $user): JsonResponse
     {
-        return $this->successResponse($user);
+        return $this->responseSuccess('Show user successfully', $user);
     }
 
     /**
@@ -75,10 +74,10 @@ class UserController extends Controller
         $isUpdated = $this->userRepo->update($user->id, $validated);
 
         if (! $isUpdated) {
-            return $this->errorResponse('User not Updated', 404);
+            return $this->responseNotFound('User not found');
         }
 
-        return $this->show($user);
+        return $this->responseSuccess('User updated successfully', $user);
     }
 
     /**
@@ -89,9 +88,9 @@ class UserController extends Controller
         $deletedUser = $this->userRepo->delete($user->id);
 
         if (! $deletedUser) {
-            return $this->errorResponse('User not Deleted', 404);
+            return $this->responseNotFound('User not found');
         }
 
-        return $this->successResponse('User Deleted Successfully', 200);
+        return $this->responseSuccess('User updated successfully', $user);
     }
 }

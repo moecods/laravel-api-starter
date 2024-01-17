@@ -8,23 +8,19 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up(): void
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
-            
-            
+            $table->string('title', 255);
+            $table->text('content');
             $table->timestamps();
         });
     }
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down(): void
     {

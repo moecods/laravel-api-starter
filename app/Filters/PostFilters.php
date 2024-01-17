@@ -8,5 +8,7 @@ class PostFilters extends QueryFilters
 {
     protected array $allowedFilters = [];
 
-    protected array $columnSearch = [];
+    protected array $columnSearch = ['title'];
+
+    protected array $allowedSorts = ['created_at'];
 }
