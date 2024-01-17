@@ -56,43 +56,37 @@ class UserController extends Controller
     /**
      * Display the specified user.
      */
-    public function show($id): JsonResponse
+    public function show(User $user): JsonResponse
     {
-        $user = $this->userRepo->findOrNull($id);
-
-        if (is_null($user)) {
-            return $this->errorResponse('User not found', 404);
-        }
-
         return $this->successResponse($user);
     }
 
     /**
      * Update the specified user in storage.
      */
-    public function update(Request $request, int $id): JsonResponse
+    public function update(Request $request, User $user): JsonResponse
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|string|min:8',
+            'name' => 'string|max:255',
+            'email' => 'email|unique:users',
+            'password' => 'string|min:8',
         ]);
 
-        $isUpdated = $this->userRepo->update($id, $validated);
+        $isUpdated = $this->userRepo->update($user->id, $validated);
 
         if (! $isUpdated) {
             return $this->errorResponse('User not Updated', 404);
         }
 
-        return $this->show($id);
+        return $this->show($user);
     }
 
     /**
      * Remove the specified user from storage.
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(User $user): JsonResponse
     {
-        $deletedUser = $this->userRepo->delete($id);
+        $deletedUser = $this->userRepo->delete($user->id);
 
         if (! $deletedUser) {
             return $this->errorResponse('User not Deleted', 404);

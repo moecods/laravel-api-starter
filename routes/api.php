@@ -3,7 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
-use Illuminate\Http\Request;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,16 +17,36 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/register', [AuthController::class, 'register'])->name('register');
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me'])->name('me');
 
-    Route::apiResource('users', UserController::class);
+    // Retrieve all users
+    Route::get('/users', [UserController::class, 'index'])
+        ->can('viewAny', User::class)
+        ->name('users.index');
+
+    // Retrieve a specific user
+    Route::get('/users/{user}', [UserController::class, 'show'])
+        ->can('view', 'user')
+        ->name('users.show');
+
+    // Create a user
+    Route::post('/users', [UserController::class, 'store'])
+        ->can('create', User::class)
+        ->name('users.store');
+
+    // Update a user
+    Route::put('/users/{user}', [UserController::class, 'update'])
+        ->can('update', 'user')
+        ->name('users.update');
+
+    // Delete a user
+    Route::delete('/users/{user}', [UserController::class, 'destroy'])
+        ->can('delete', 'user')
+        ->name('users.destroy');
+
     Route::apiResource('roles', RoleController::class)->except('show');
 });
