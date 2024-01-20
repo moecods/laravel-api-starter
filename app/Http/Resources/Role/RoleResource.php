@@ -10,9 +10,13 @@ class RoleResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            
-            'created_at' => dateTimeFormat($this->created_at),
-            'updated_at' => dateTimeFormat($this->updated_at),
+            'name' => $this->name,
+            'permissions' => $this->permissions->map(function ($permission) {
+                return [
+                    'id' => $permission->id,
+                    'name' => $permission->name,
+                ];
+            }),
         ];
     }
 }

@@ -2,16 +2,17 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class RoleTest extends TestCase
 {
-    use  RefreshDatabase;
+    use RefreshDatabase;
 
     protected string $endpoint = '/api/roles';
+
     protected string $tableName = 'roles';
 
     public function setUp(): void
@@ -28,8 +29,8 @@ class RoleTest extends TestCase
         $payload = Role::factory()->make([])->toArray();
 
         $this->json('POST', $this->endpoint, $payload)
-             ->assertStatus(201)
-             ->assertSee($payload['name']);
+            ->assertStatus(201)
+            ->assertSee($payload['name']);
 
         $this->assertDatabaseHas($this->tableName, ['id' => 1]);
     }
@@ -43,9 +44,9 @@ class RoleTest extends TestCase
         Role::factory(5)->create();
 
         $this->json('GET', $this->endpoint)
-             ->assertStatus(200)
-             ->assertJsonCount(5, 'data')
-             ->assertSee(Role::first(rand(1, 5))->name);
+            ->assertStatus(200)
+            ->assertJsonCount(5, 'data')
+            ->assertSee(Role::first(rand(1, 5))->name);
     }
 
     public function testViewAllRolesByFooFilter(): void
@@ -57,9 +58,9 @@ class RoleTest extends TestCase
         Role::factory(5)->create();
 
         $this->json('GET', $this->endpoint.'?foo=1')
-             ->assertStatus(200)
-             ->assertSee('foo')
-             ->assertDontSee('foo');
+            ->assertStatus(200)
+            ->assertSee('foo')
+            ->assertDontSee('foo');
     }
 
     public function testsCreateRoleValidation(): void
@@ -72,7 +73,7 @@ class RoleTest extends TestCase
         ];
 
         $this->json('post', $this->endpoint, $data)
-             ->assertStatus(422);
+            ->assertStatus(422);
     }
 
     public function testViewRoleData(): void
@@ -84,8 +85,8 @@ class RoleTest extends TestCase
         Role::factory()->create();
 
         $this->json('GET', $this->endpoint.'/1')
-             ->assertSee(Role::first()->name)
-             ->assertStatus(200);
+            ->assertSee(Role::first()->name)
+            ->assertStatus(200);
     }
 
     public function testUpdateRole(): void
@@ -97,12 +98,12 @@ class RoleTest extends TestCase
         Role::factory()->create();
 
         $payload = [
-            'name' => 'Random'
+            'name' => 'Random',
         ];
 
         $this->json('PUT', $this->endpoint.'/1', $payload)
-             ->assertStatus(200)
-             ->assertSee($payload['name']);
+            ->assertStatus(200)
+            ->assertSee($payload['name']);
     }
 
     public function testDeleteRole(): void
@@ -114,9 +115,8 @@ class RoleTest extends TestCase
         Role::factory()->create();
 
         $this->json('DELETE', $this->endpoint.'/1')
-             ->assertStatus(204);
+            ->assertStatus(204);
 
         $this->assertEquals(0, Role::count());
     }
-    
 }
