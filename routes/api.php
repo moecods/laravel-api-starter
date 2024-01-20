@@ -1,9 +1,9 @@
 <?php
 
 use App\Http\Controllers\API\PostController;
+use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RoleController;
-use App\Http\Controllers\UserController;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
@@ -50,12 +50,6 @@ Route::middleware('auth:sanctum')->group(function () {
         ->name('users.destroy');
 
     Route::apiResource('roles', RoleController::class)->except('show');
+    Route::apiResource('/posts', PostController::class);
+
 });
-
-/*===========================
-=           posts           =
-=============================*/
-
-Route::apiResource('/posts', PostController::class);
-
-/*=====  End of posts   ======*/
