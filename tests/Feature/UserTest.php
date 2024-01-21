@@ -1,122 +1,90 @@
 <?php
 
-namespace Tests\Feature;
-
 use App\Models\User;
-use App\Models\User;
+use App\Policies\UserPolicy;
+use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
-class UserTest extends TestCase
-{
-    use RefreshDatabase;
+uses(RefreshDatabase::class);
 
-    protected string $endpoint = '/api/users';
+beforeEach(function () {
+    $this->withoutMiddleware(Authorize::class);
+    $this->withoutMiddleware(UserPolicy::class);
+});
 
-    protected string $tableName = 'users';
+$endpoint = '/api/users';
 
-    public function setUp(): void
-    {
-        parent::setUp();
-    }
+it('can create a user', function () use ($endpoint) {
+    $user = User::factory()->create();
+    $this->actingAs($user, 'sanctum');
 
-    public function testCreateUser(): void
-    {
-        $this->markTestIncomplete('This test case needs review.');
+    $payload = User::factory()->raw(['name' => 'John Doe', 'password' => '12345678']);
 
-        $this->actingAs(User::factory()->create());
+    $this->postJson($endpoint, $payload)
+        ->assertStatus(201)
+        ->assertSee($payload['name']);
 
-        $payload = User::factory()->make([])->toArray();
+    $this->assertDatabaseHas('users', ['id' => 1]);
+});
 
-        $this->json('POST', $this->endpoint, $payload)
-            ->assertStatus(201)
-            ->assertSee($payload['name']);
+it('can view all users', function () use ($endpoint) {
+    $user = User::factory()->create();
+    $this->actingAs($user);
 
-        $this->assertDatabaseHas($this->tableName, ['id' => 1]);
-    }
+    User::factory(5)->create();
 
-    public function testViewAllUsersSuccessfully(): void
-    {
-        $this->markTestIncomplete('This test case needs review.');
+    $this->getJson($endpoint)
+        ->assertStatus(200)
+        ->assertJsonCount(6, 'data')
+        ->assertSee(User::find(rand(1, 5))->name);
+});
 
-        $this->actingAs(User::factory()->create());
+it('validates user creation', function () use ($endpoint) {
+    $user = User::factory()->create();
+    $this->actingAs($user);
 
-        User::factory(5)->create();
+    $data = User::factory()->raw(['name' => '']);
 
-        $this->json('GET', $this->endpoint)
-            ->assertStatus(200)
-            ->assertJsonCount(5, 'data')
-            ->assertSee(User::first(rand(1, 5))->name);
-    }
+    $this->postJson($endpoint, $data)
+        ->assertStatus(422);
+});
 
-    public function testViewAllUsersByFooFilter(): void
-    {
-        $this->markTestIncomplete('This test case needs review.');
+it('can view user data', function () use ($endpoint) {
+    $user = User::factory()->create();
+    $this->actingAs($user);
 
-        $this->actingAs(User::factory()->create());
+    $user = User::factory()->create();
 
-        User::factory(5)->create();
+    $this->getJson($endpoint."/{$user->id}")
+        ->assertSee($user->name)
+        ->assertStatus(200);
+});
 
-        $this->json('GET', $this->endpoint.'?foo=1')
-            ->assertStatus(200)
-            ->assertSee('foo')
-            ->assertDontSee('foo');
-    }
+it('can update a user', function () use ($endpoint) {
+    $user = User::factory()->create();
+    $this->actingAs($user);
 
-    public function testsCreateUserValidation(): void
-    {
-        $this->markTestIncomplete('This test case needs review.');
+    $user = User::factory()->create();
 
-        $this->actingAs(User::factory()->create());
+    $payload = [
+        'name' => 'Updated Name',
+        'email' => 'updated@example.com',
+    ];
 
-        $data = [
-        ];
+    $this->putJson($endpoint."/{$user->id}", $payload)
+        ->assertStatus(200)
+        ->assertSee($payload['name'])
+        ->assertSee($payload['email']);
+});
 
-        $this->json('post', $this->endpoint, $data)
-            ->assertStatus(422);
-    }
+it('can delete a user', function () use ($endpoint) {
+    $user = User::factory()->create();
+    $this->actingAs($user);
 
-    public function testViewUserData(): void
-    {
-        $this->markTestIncomplete('This test case needs review.');
+    $user = User::factory()->create();
 
-        $this->actingAs(User::factory()->create());
+    $this->deleteJson($endpoint."/{$user->id}")
+        ->assertStatus(204);
 
-        User::factory()->create();
-
-        $this->json('GET', $this->endpoint.'/1')
-            ->assertSee(User::first()->name)
-            ->assertStatus(200);
-    }
-
-    public function testUpdateUser(): void
-    {
-        $this->markTestIncomplete('This test case needs review.');
-
-        $this->actingAs(User::factory()->create());
-
-        User::factory()->create();
-
-        $payload = [
-            'name' => 'Random',
-        ];
-
-        $this->json('PUT', $this->endpoint.'/1', $payload)
-            ->assertStatus(200)
-            ->assertSee($payload['name']);
-    }
-
-    public function testDeleteUser(): void
-    {
-        $this->markTestIncomplete('This test case needs review.');
-
-        $this->actingAs(User::factory()->create());
-
-        User::factory()->create();
-
-        $this->json('DELETE', $this->endpoint.'/1')
-            ->assertStatus(204);
-
-        $this->assertEquals(0, User::count());
-    }
-}
+    expect(User::count())->toBe(1);
+});

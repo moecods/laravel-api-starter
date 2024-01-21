@@ -1,122 +1,97 @@
 <?php
 
-namespace Tests\Feature;
-
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
-class PostTest extends TestCase
-{
-    use RefreshDatabase;
+uses(RefreshDatabase::class);
 
-    protected string $endpoint = '/api/posts';
+$endpoint = '/api/posts';
 
-    protected string $tableName = 'posts';
+it('can create a post', function () use ($endpoint) {
+    $user = User::factory()->create();
+    $this->actingAs($user);
 
-    public function setUp(): void
-    {
-        parent::setUp();
-    }
+    $payload = Post::factory()->make(['title' => 'The fake title'])->toArray();
 
-    public function testCreatePost(): void
-    {
-        $this->markTestIncomplete('This test case needs review.');
+    $this->postJson($endpoint, $payload)
+        ->assertStatus(201)
+        ->assertSee($payload['title']);
 
-        $this->actingAs(User::factory()->create());
+    $this->assertDatabaseHas('posts', ['id' => 1]);
+});
 
-        $payload = Post::factory()->make([])->toArray();
+it('can view all posts successfully', function () use ($endpoint) {
+    $user = User::factory()->create();
+    $this->actingAs($user);
 
-        $this->json('POST', $this->endpoint, $payload)
-            ->assertStatus(201)
-            ->assertSee($payload['name']);
+    Post::factory(5)->create();
 
-        $this->assertDatabaseHas($this->tableName, ['id' => 1]);
-    }
+    $this->getJson($endpoint)
+        ->assertStatus(200)
+        ->assertJsonCount(5, 'data')
+        ->assertSee(Post::query()->inRandomOrder()->first()->title);
+});
 
-    public function testViewAllPostsSuccessfully(): void
-    {
-        $this->markTestIncomplete('This test case needs review.');
+it('can view all posts by title filter', function () use ($endpoint) {
+    $user = User::factory()->create();
+    $this->actingAs($user);
 
-        $this->actingAs(User::factory()->create());
+    Post::factory(5)->create();
+    Post::factory()->create(['title' => 'test']);
 
-        Post::factory(5)->create();
+    $this->getJson($endpoint, ['title' => 'test'])
+        ->assertStatus(200)
+        ->assertSee('test')
+        ->assertDontSee('foo');
+});
 
-        $this->json('GET', $this->endpoint)
-            ->assertStatus(200)
-            ->assertJsonCount(5, 'data')
-            ->assertSee(Post::first(rand(1, 5))->name);
-    }
+it('validates post creation', function () use ($endpoint) {
+    $user = User::factory()->create();
+    $this->actingAs($user);
 
-    public function testViewAllPostsByFooFilter(): void
-    {
-        $this->markTestIncomplete('This test case needs review.');
+    $data = Post::factory()->raw(['title' => '']);
 
-        $this->actingAs(User::factory()->create());
+    $this->postJson($endpoint, $data)
+        ->assertStatus(422);
+});
 
-        Post::factory(5)->create();
+it('can view post data', function () use ($endpoint) {
+    $user = User::factory()->create();
+    $this->actingAs($user);
 
-        $this->json('GET', $this->endpoint.'?foo=1')
-            ->assertStatus(200)
-            ->assertSee('foo')
-            ->assertDontSee('foo');
-    }
+    $post = Post::factory()->create();
 
-    public function testsCreatePostValidation(): void
-    {
-        $this->markTestIncomplete('This test case needs review.');
+    $this->getJson($endpoint."/{$post->id}")
+        ->assertSee(Post::first()->title)
+        ->assertStatus(200);
+});
 
-        $this->actingAs(User::factory()->create());
+it('can update a post', function () use ($endpoint) {
+    $user = User::factory()->create();
+    $this->actingAs($user);
 
-        $data = [
-        ];
+    $post = Post::factory()->create();
 
-        $this->json('post', $this->endpoint, $data)
-            ->assertStatus(422);
-    }
+    $payload = [
+        'title' => 'Random',
+        'content' => 'Random Content',
+    ];
 
-    public function testViewPostData(): void
-    {
-        $this->markTestIncomplete('This test case needs review.');
+    $this->putJson($endpoint."/{$post->id}", $payload)
+        ->assertStatus(200)
+        ->assertSee($payload['title'])
+        ->assertSee($payload['content']);
+});
 
-        $this->actingAs(User::factory()->create());
+it('can delete a post', function () use ($endpoint) {
+    $user = User::factory()->create();
+    $this->actingAs($user);
 
-        Post::factory()->create();
+    $post = Post::factory()->create();
 
-        $this->json('GET', $this->endpoint.'/1')
-            ->assertSee(Post::first()->name)
-            ->assertStatus(200);
-    }
+    $this->deleteJson($endpoint."/{$post->id}")
+        ->assertStatus(204);
 
-    public function testUpdatePost(): void
-    {
-        $this->markTestIncomplete('This test case needs review.');
-
-        $this->actingAs(User::factory()->create());
-
-        Post::factory()->create();
-
-        $payload = [
-            'name' => 'Random',
-        ];
-
-        $this->json('PUT', $this->endpoint.'/1', $payload)
-            ->assertStatus(200)
-            ->assertSee($payload['name']);
-    }
-
-    public function testDeletePost(): void
-    {
-        $this->markTestIncomplete('This test case needs review.');
-
-        $this->actingAs(User::factory()->create());
-
-        Post::factory()->create();
-
-        $this->json('DELETE', $this->endpoint.'/1')
-            ->assertStatus(204);
-
-        $this->assertEquals(0, Post::count());
-    }
-}
+    expect(Post::count())->toBe(0);
+});
