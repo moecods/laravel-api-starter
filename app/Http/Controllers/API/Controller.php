@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
 
 use Essa\APIToolKit\Api\ApiResponse;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;

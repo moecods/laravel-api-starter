@@ -1,9 +1,9 @@
 <?php
 
+use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\PostController;
 use App\Http\Controllers\API\RoleController;
 use App\Http\Controllers\API\UserController;
-use App\Http\Controllers\AuthController;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 

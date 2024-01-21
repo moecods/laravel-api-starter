@@ -1,16 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
 
 use App\Models\User;
-use App\Traits\ResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
-    use ResponseTrait;
-
     public function login(Request $request): JsonResponse
     {
         $credentials = $request->only(['email', 'password']);
@@ -19,24 +16,24 @@ class AuthController extends Controller
             'password' => 'required|min:8',
         ]);
         if (! auth()->attempt($credentials)) {
-            return $this->errorResponse(['message' => 'Unauthorized'], 401);
+            return $this->responseUnAuthorized('you are not authorized to perform login');
         }
         $user = auth()->user();
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return $this->successResponse(['access_token' => $token, 'token_type' => 'Bearer']);
+        return $this->responseSuccess('login successfully', ['access_token' => $token, 'token_type' => 'Bearer']);
     }
 
     public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
 
-        return $this->successResponse(['message' => 'Logged out']);
+        return $this->responseSuccess('Logged out');
     }
 
     public function me(Request $request): JsonResponse
     {
-        return $this->successResponse($request->user());
+        return $this->responseSuccess(null, $request->user());
     }
 
     public function register(Request $request): JsonResponse
@@ -51,7 +48,7 @@ class AuthController extends Controller
         $user = User::query()->create($validated);
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return $this->successResponse(['access_token' => $token, 'token_type' => 'Bearer']);
+        return $this->responseSuccess('register successfully', ['access_token' => $token, 'token_type' => 'Bearer']);
     }
 
     public function refresh(Request $request): JsonResponse
@@ -60,6 +57,6 @@ class AuthController extends Controller
         $user->tokens()->delete();
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return $this->successResponse(['access_token' => $token, 'token_type' => 'Bearer']);
+        return $this->responseSuccess('refresh successfully', ['access_token' => $token, 'token_type' => 'Bearer']);
     }
 }
