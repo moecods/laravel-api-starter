@@ -21,8 +21,10 @@ it('allows a user to register with valid credentials', function () {
     $response
         ->assertOk()
         ->assertJsonStructure([
-            'access_token',
-            'token_type',
+            'data' => [
+                'access_token',
+                'token_type',
+            ],
         ]);
 
     // Ensure the user is stored in the database
@@ -68,7 +70,7 @@ it('fails registration if the email is already in use', function () {
     $this->postJson(route('register'), $userData)
         ->assertStatus(422)
         ->assertJsonValidationErrors(['email'])
-        ->assertJsonFragment(['email' => ['The email has already been taken.']]);
+        ->assertJsonFragment(['detail' => 'The email has already been taken.']);
 });
 
 it('fails registration if the password does not meet strength requirements', function () {
@@ -97,5 +99,5 @@ it('fails registration if the email format is invalid', function () {
     $this->postJson(route('register'), $userData)
         ->assertStatus(422)
         ->assertJsonValidationErrors(['email'])
-        ->assertJson(['message' => 'The email field must be a valid email address.']);
+        ->assertJsonFragment(['detail' => 'The email field must be a valid email address.']);
 });

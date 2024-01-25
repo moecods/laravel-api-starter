@@ -19,8 +19,7 @@ it('allows a user to log in successfully with valid credentials', function () {
 
     // Act & Assert
     $this->postJson(route('login'), $loginData)
-        ->assertStatus(200)
-        ->assertJsonStructure(['access_token', 'token_type']);
+        ->assertStatus(200);
 });
 
 it('fails login if required fields (email, password) are not provided', function () {

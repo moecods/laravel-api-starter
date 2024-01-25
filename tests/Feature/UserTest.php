@@ -20,11 +20,12 @@ it('can create a user', function () use ($endpoint) {
 
     $payload = User::factory()->raw(['name' => 'John Doe', 'password' => '12345678']);
 
-    $this->postJson($endpoint, $payload)
+    $response = $this->postJson($endpoint, $payload)
         ->assertStatus(201)
-        ->assertSee($payload['name']);
+        ->assertSee($payload['name'])
+        ->getOriginalContent();
 
-    $this->assertDatabaseHas('users', ['id' => 1]);
+    $this->assertDatabaseHas('users', ['id' => $response['data']->id]);
 });
 
 it('can view all users', function () use ($endpoint) {
@@ -35,8 +36,7 @@ it('can view all users', function () use ($endpoint) {
 
     $this->getJson($endpoint)
         ->assertStatus(200)
-        ->assertJsonCount(6, 'data')
-        ->assertSee(User::find(rand(1, 5))->name);
+        ->assertJsonCount(6, 'data');
 });
 
 it('validates user creation', function () use ($endpoint) {

@@ -3,13 +3,14 @@
 namespace App\Authentication;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class EmailAuthStrategy implements AuthStrategy
 {
     private $email;
+
     private $password;
+
     private ?string $name;
 
     public function __construct($email, $password, $name = null)
@@ -23,7 +24,7 @@ class EmailAuthStrategy implements AuthStrategy
     {
         return auth()->attempt([
             'email' => $this->email,
-            'password' => $this->password
+            'password' => $this->password,
         ]);
     }
 
@@ -40,6 +41,7 @@ class EmailAuthStrategy implements AuthStrategy
         ]);
 
         $password = bcrypt($this->password);
+
         return User::query()->create([
             'name' => $this->name,
             'email' => $this->email,
