@@ -9,7 +9,7 @@ use App\Models\Post;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class PostController extends Controller
+class PostController extends APIController
 {
     public function __construct()
     {

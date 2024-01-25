@@ -2,22 +2,23 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
-class AuthController extends Controller
+class AuthController extends APIController
 {
-    public function login(Request $request): JsonResponse
+    public function login(LoginRequest $request): JsonResponse
     {
         $credentials = $request->only(['email', 'password']);
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|min:8',
-        ]);
-        if (! auth()->attempt($credentials)) {
-            return $this->responseUnAuthorized('you are not authorized to perform login');
+
+        if (! Auth::guard('web')->attempt($credentials)) {
+            return $this->responseUnAuthenticated('you are not authorized to perform login');
         }
+
         $user = auth()->user();
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -36,16 +37,9 @@ class AuthController extends Controller
         return $this->responseSuccess(null, $request->user());
     }
 
-    public function register(Request $request): JsonResponse
+    public function register(RegisterRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
-        $validated['password'] = bcrypt($validated['password']);
-        $user = User::query()->create($validated);
+        $user = User::query()->create($request->validated());
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return $this->responseSuccess('register successfully', ['access_token' => $token, 'token_type' => 'Bearer']);

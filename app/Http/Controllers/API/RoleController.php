@@ -10,7 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
-class RoleController extends Controller
+class RoleController extends APIController
 {
     public function __construct()
     {
