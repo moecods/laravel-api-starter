@@ -4,7 +4,7 @@ namespace App\Authentication;
 
 interface AuthStrategy
 {
-    public function authenticate();
+    public function authenticate(string $email, string $password);
 
-    public function register();
+    public function register(string $name, string $email, string $password);
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Actions\SendUserVerificationCodeAction;
+use App\Authentication\EmailAuthStrategy;
 use App\Events\UserRegisteredEvent;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
@@ -10,22 +11,38 @@ use App\Models\User;
 use Ichtrojan\Otp\Otp;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class AuthController extends APIController
 {
     public function login(LoginRequest $request): JsonResponse
     {
-        $credentials = $request->only(['email', 'password']);
+        $strategy = new EmailAuthStrategy();
 
-        if (! Auth::guard('web')->attempt($credentials)) {
-            return $this->responseUnAuthenticated('you are not authorized to perform login');
-        }
+        $strategy
+            ->authenticate($request->email, $request->password)
+            ->ifUnauthenticated(fn () => $this->responseUnAuthenticated('you are not authorized to perform login'))
+            ->createToken();
 
-        $user = auth()->user();
-        $token = $user->createToken('auth_token')->plainTextToken;
+        return $this->responseSuccess('login successfully', [
+            'access_token' => $strategy->getToken(),
+            'token_type' => 'Bearer',
+        ]);
+    }
 
-        return $this->responseSuccess('login successfully', ['access_token' => $token, 'token_type' => 'Bearer']);
+    public function register(RegisterRequest $request): JsonResponse
+    {
+        $strategy = new EmailAuthStrategy();
+
+        $strategy
+            ->register($request->name, $request->email, $request->password)
+            ->createToken();
+
+        event(new UserRegisteredEvent($strategy->getUser()));
+
+        return $this->responseSuccess('register successfully', [
+            'access_token' => $strategy->getToken(),
+            'token_type' => 'Bearer',
+        ]);
     }
 
     public function logout(Request $request): JsonResponse

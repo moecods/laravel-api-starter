@@ -3,49 +3,71 @@
 namespace App\Authentication;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class EmailAuthStrategy implements AuthStrategy
 {
-    private $email;
+    public $user;
 
-    private $password;
+    public bool $isAuthenticated = false;
 
-    private ?string $name;
+    private $token;
 
-    public function __construct($email, $password, $name = null)
+    public function __construct()
     {
-        $this->email = $email;
-        $this->password = $password;
-        $this->name = $name;
     }
 
-    public function authenticate()
+    public function authenticate($email, $password)
     {
-        return auth()->attempt([
-            'email' => $this->email,
-            'password' => $this->password,
-        ]);
-    }
-
-    public function register()
-    {
-        Validator::validate([
-            'name' => $this->name,
-            'email' => $this->email,
-            'password' => $this->password,
-        ], [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
-        $password = bcrypt($this->password);
-
-        return User::query()->create([
-            'name' => $this->name,
-            'email' => $this->email,
+        $this->isAuthenticated = Auth::guard('web')->attempt([
+            'email' => $email,
             'password' => $password,
         ]);
+
+        $this->user = auth()->user();
+
+        return $this;
+    }
+
+    public function isAuthenticated(): bool
+    {
+        return $this->isAuthenticated;
+    }
+
+    public function register(string $name, string $email, string $password)
+    {
+        $this->user = User::query()->create([
+            'name' => $name,
+            'email' => $email,
+            'password' => $password,
+        ]);
+
+        return $this;
+    }
+
+    public function createToken()
+    {
+        $this->token = $this->user->createToken('auth_token')->plainTextToken;
+
+        return $this;
+    }
+
+    public function getToken()
+    {
+        return $this->token;
+    }
+
+    public function ifUnauthenticated(\Closure $param)
+    {
+        if (! $this->isAuthenticated) {
+            abort($param());
+        }
+
+        return $this;
+    }
+
+    public function getUser(): User
+    {
+        return $this->user;
     }
 }
