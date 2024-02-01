@@ -2,24 +2,18 @@
 
 namespace App\Listeners;
 
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
+use App\Actions\SendWelcomeUserAction;
+use App\Events\UserRegisteredEvent;
 
 class SendWelcomeEmailListener
 {
-    /**
-     * Create the event listener.
-     */
     public function __construct()
     {
         //
     }
 
-    /**
-     * Handle the event.
-     */
-    public function handle(object $event): void
+    public function handle(UserRegisteredEvent $event): void
     {
-        //
+        app(SendWelcomeUserAction::class)->execute($event->user);
     }
 }
