@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Welcome to [Your Website Name]!</title>
+    <title>Welcome to {{ config('app.name') }}!</title>
 </head>
 <body>
 <h1>Welcome, {{ $user->name }}!</h1>
