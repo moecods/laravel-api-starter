@@ -1,21 +1,18 @@
 <?php
 
+use App\Mail\UserWelcomeMail;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 
 uses(RefreshDatabase::class);
 
 it('allows a user to register with valid credentials', function () {
     // Arrange
-    $userData = [
-        'name' => 'John Doe',
-        'email' => 'john@example.com',
-        'password' => 'password123',
-        'password_confirmation' => 'password123',
-    ];
+    $userCredentials = generateValidUserCredentialsForRegistration();
 
     // Act
-    $response = $this->postJson(route('register'), $userData);
+    $response = $this->postJson(route('register'), $userCredentials);
 
     // Assert
     $response
@@ -29,8 +26,8 @@ it('allows a user to register with valid credentials', function () {
 
     // Ensure the user is stored in the database
     $this->assertDatabaseHas('users', [
-        'name' => 'John Doe',
-        'email' => 'john@example.com',
+        'name' => $userCredentials['name'],
+        'email' => $userCredentials['email'],
     ]);
 });
 
@@ -101,3 +98,34 @@ it('fails registration if the email format is invalid', function () {
         ->assertJsonValidationErrors(['email'])
         ->assertJsonFragment(['detail' => 'The email field must be a valid email address.']);
 });
+
+it('sends a welcome email after user registration', function () {
+    // Disable mail sending temporarily for a clean test
+    Mail::fake();
+
+    $userCredentials = generateValidUserCredentialsForRegistration();
+
+    // Register a user
+    $response = $this->post(route('register'), $userCredentials);
+
+    // Assert that the user was created successfully
+    $response->assertStatus(200);
+
+    // Retrieve the registered user from the database
+    $user = User::where('email', $userCredentials['email'])->first();
+
+    // Assert that a welcome email was sent to the user
+    Mail::assertSent(UserWelcomeMail::class, function ($mail) use ($user) {
+        return $mail->hasTo($user->email);
+    });
+});
+
+function generateValidUserCredentialsForRegistration(): array
+{
+    return [
+        'name' => 'John Doe',
+        'email' => 'john@example.com',
+        'password' => 'password123',
+        'password_confirmation' => 'password123',
+    ];
+}
