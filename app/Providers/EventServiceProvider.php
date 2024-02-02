@@ -3,16 +3,16 @@
 namespace App\Providers;
 
 use App\Events\UserRegisteredEvent;
-use App\Listeners\SendVerificationCodeListener;
-use App\Listeners\SendWelcomeEmailListener;
+use App\Listeners\SendUserVerificationCodeListener;
+use App\Listeners\SendUserWelcomeListener;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
 {
     protected $listen = [
         UserRegisteredEvent::class => [
-            SendWelcomeEmailListener::class,
-            SendVerificationCodeListener::class,
+            SendUserWelcomeListener::class,
+            SendUserVerificationCodeListener::class,
         ],
     ];
 

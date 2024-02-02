@@ -7,7 +7,7 @@ use App\Models\User;
 use Ichtrojan\Otp\Otp;
 use Illuminate\Support\Facades\Mail;
 
-class SendVerificationCodeUserAction
+class SendUserVerificationCodeAction
 {
     public $otpResponse;
 

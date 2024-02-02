@@ -2,16 +2,16 @@
 
 namespace App\Listeners;
 
-use App\Actions\SendVerificationCodeUserAction;
+use App\Actions\SendUserVerificationCodeAction;
 use App\Events\UserRegisteredEvent;
 
-class SendVerificationCodeListener
+class SendUserVerificationCodeListener
 {
     /**
      * Handle the event.
      */
     public function handle(UserRegisteredEvent $event): void
     {
-        app(SendVerificationCodeUserAction::class)->execute($event->user);
+        app(SendUserVerificationCodeAction::class)->execute($event->user);
     }
 }

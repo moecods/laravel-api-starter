@@ -2,13 +2,13 @@
 
 namespace App\Listeners;
 
-use App\Actions\SendWelcomeUserAction;
+use App\Actions\SendUserWelcomeAction;
 use App\Events\UserRegisteredEvent;
 
-class SendWelcomeEmailListener
+class SendUserWelcomeListener
 {
     public function handle(UserRegisteredEvent $event): void
     {
-        app(SendWelcomeUserAction::class)->execute($event->user);
+        app(SendUserWelcomeAction::class)->execute($event->user);
     }
 }

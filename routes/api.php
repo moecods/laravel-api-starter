@@ -24,9 +24,9 @@ Route::post('/verify-email', [AuthController::class, 'verifyEmail'])
     ->middleware('auth:sanctum')
     ->name('verify-email');
 
-Route::post('/send-verify-email-code', [AuthController::class, 'sendVerifyEmailCode'])
+Route::post('/request-verification-code', [AuthController::class, 'requestVerificationCode'])
     ->middleware('auth:sanctum')
-    ->name('send-verify-email-code');
+    ->name('request-verification-code');
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/me', [AuthController::class, 'me'])->name('me');

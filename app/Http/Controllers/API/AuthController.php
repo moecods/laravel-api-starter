@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Actions\SendVerificationCodeUserAction;
+use App\Actions\SendUserVerificationCodeAction;
 use App\Events\UserRegisteredEvent;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
@@ -80,14 +80,15 @@ class AuthController extends APIController
         return $this->responseConflictError('', $response->message);
     }
 
-    public function sendVerifyEmailCode(Request $request): JsonResponse
+    public function requestVerificationCode(Request $request): JsonResponse
     {
         $user = $request->user();
+
         if ($user->email_verified_at) {
             return $this->responseConflictError('', 'email already verified');
         }
 
-        $action = app(SendVerificationCodeUserAction::class);
+        $action = app(SendUserVerificationCodeAction::class);
         $action->execute($user);
         $otpResponse = $action->getOtpResponse();
 
