@@ -20,8 +20,15 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/register', [AuthController::class, 'register'])->name('register');
+Route::post('/verify-email', [AuthController::class, 'verifyEmail'])
+    ->middleware('auth:sanctum')
+    ->name('verify-email');
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::post('/send-verify-email-code', [AuthController::class, 'sendVerifyEmailCode'])
+    ->middleware('auth:sanctum')
+    ->name('send-verify-email-code');
+
+Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/me', [AuthController::class, 'me'])->name('me');
 
     // Retrieve all users

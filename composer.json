@@ -10,6 +10,7 @@
         "doctrine/dbal": "^3.7",
         "essa/api-tool-kit": "^2.1",
         "guzzlehttp/guzzle": "^7.2",
+        "ichtrojan/laravel-otp": "^2.0",
         "itsgoingd/clockwork": "^5.1",
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",
