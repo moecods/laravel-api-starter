@@ -3,6 +3,7 @@
 use App\Mail\UserWelcomeMail;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
 uses(RefreshDatabase::class);
@@ -105,19 +106,41 @@ it('sends a welcome email after user registration', function () {
 
     $userCredentials = generateValidUserCredentialsForRegistration();
 
-    // Register a user
-    $response = $this->post(route('register'), $userCredentials);
-
-    // Assert that the user was created successfully
-    $response->assertStatus(200);
-
-    // Retrieve the registered user from the database
-    $user = User::where('email', $userCredentials['email'])->first();
+    // Register and get a user
+    $user = getUserAfterRegistration();
 
     // Assert that a welcome email was sent to the user
     Mail::assertSent(UserWelcomeMail::class, function ($mail) use ($user) {
         return $mail->hasTo($user->email);
     });
+});
+
+it('sends a verification code email after user registration', function () {
+    // Disable mail sending temporarily for a clean test
+    Mail::fake();
+
+    // Register and get a user
+    $user = getUserAfterRegistration();
+
+    // Assert that a verification code was sent to the user
+    Mail::assertSent(UserWelcomeMail::class, function ($mail) use ($user) {
+        return $mail->hasTo($user->email);
+    });
+});
+
+it('user send verification code and confirms email', function () {
+    // Disable mail sending temporarily for a clean test
+    Mail::fake();
+
+    // Register and get a user
+    $user = getUserAfterRegistration();
+
+    $this->actingAs($user);
+
+    $this->assertFalse($user->hasVerifiedEmail());
+
+    $verificationCode = DB::table('otps')->where('identifier', $user->email)->first()->token;
+    $this->postJson(route('verify-email'), ['code' => $verificationCode])->assertOk();
 });
 
 function generateValidUserCredentialsForRegistration(): array
@@ -128,4 +151,13 @@ function generateValidUserCredentialsForRegistration(): array
         'password' => 'password123',
         'password_confirmation' => 'password123',
     ];
+}
+
+function getUserAfterRegistration(): User
+{
+    $userCredentials = generateValidUserCredentialsForRegistration();
+
+    test()->post(route('register'), $userCredentials)->assertOk();
+
+    return User::where('email', $userCredentials['email'])->first();
 }
