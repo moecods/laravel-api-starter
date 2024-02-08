@@ -3,23 +3,22 @@
 namespace App\Http\Controllers\API;
 
 use App\Actions\SendUserVerificationCodeAction;
-use App\Authentication\EmailAuth;
+use App\Authentication\MobileAuth;
 use App\Events\UserRegisteredEvent;
-use App\Http\Requests\Auth\LoginRequest;
-use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Requests\Auth\MobileLoginRequest;
+use App\Http\Requests\Auth\MobileRegisterRequest;
 use Ichtrojan\Otp\Otp;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class AuthController extends APIController
+class AuthMobileController extends APIController
 {
-    public function login(LoginRequest $request): JsonResponse
+    public function login(MobileLoginRequest $request): JsonResponse
     {
-        $strategy = new EmailAuth();
-        // authenticate
-        // verify
+        $strategy = new MobileAuth();
+
         $strategy
-            ->authenticate($request->email, $request->password)
+            ->authenticate($request->mobile, $request->password)
             ->ifUnauthenticated(fn () => $this->responseUnAuthenticated('you are not authorized to perform login'))
             ->createToken();
 
@@ -29,20 +28,36 @@ class AuthController extends APIController
         ]);
     }
 
-    public function register(RegisterRequest $request): JsonResponse
+    public function register(MobileRegisterRequest $request): JsonResponse
     {
-        $strategy = new EmailAuth();
+        $strategy = new MobileAuth();
+        $strategy->checkOtp($request->mobile, $request->code)
+            ->ifOtpUnVerified(fn () => $this->responseConflictError('otp is not verified'));
 
-        $strategy
-            ->register($request->name, $request->email, $request->password)
+        $strategy->register($request->mobile, $request->password, $request->validated())
             ->createToken();
 
-        event(new UserRegisteredEvent($strategy->getUser()));
+        // Todo: handle send verification code by mobile
+        // event(new UserRegisteredEvent($strategy->getUser()));
 
         return $this->responseSuccess('register successfully', [
             'access_token' => $strategy->getToken(),
             'token_type' => 'Bearer',
         ]);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function sendOTP(Request $request)
+    {
+        $request->validate([
+            'mobile' => 'required|numeric|digits:11',
+        ]);
+
+        (new Otp())->generate($request->mobile, 'numeric');
+
+        return $this->responseSuccess('OTP sent successfully');
     }
 
     public function logout(Request $request): JsonResponse

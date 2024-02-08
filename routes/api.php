@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\AuthMobileController;
 use App\Http\Controllers\API\PostController;
 use App\Http\Controllers\API\RoleController;
 use App\Http\Controllers\API\UserController;
@@ -23,6 +24,10 @@ Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/verify-email', [AuthController::class, 'verifyEmail'])
     ->middleware('auth:sanctum')
     ->name('verify-email');
+
+Route::post('/mobile/login', [AuthMobileController::class, 'login'])->name('mobile.login');
+Route::post('/mobile/register', [AuthMobileController::class, 'register'])->name('mobile.register');
+Route::post('/mobile/send-otp', [AuthMobileController::class, 'sendOTP'])->name('mobile.send-otp');
 
 Route::post('/request-verification-code', [AuthController::class, 'requestVerificationCode'])
     ->middleware('auth:sanctum')

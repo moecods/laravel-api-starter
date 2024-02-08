@@ -5,11 +5,9 @@ namespace App\Authentication;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
-class EmailAuthStrategy implements AuthStrategy
+class EmailAuth extends Authentication
 {
     public $user;
-
-    public bool $isAuthenticated = false;
 
     private $token;
 
@@ -41,27 +39,6 @@ class EmailAuthStrategy implements AuthStrategy
             'email' => $email,
             'password' => $password,
         ]);
-
-        return $this;
-    }
-
-    public function createToken()
-    {
-        $this->token = $this->user->createToken('auth_token')->plainTextToken;
-
-        return $this;
-    }
-
-    public function getToken()
-    {
-        return $this->token;
-    }
-
-    public function ifUnauthenticated(\Closure $param)
-    {
-        if (! $this->isAuthenticated) {
-            abort($param());
-        }
 
         return $this;
     }
