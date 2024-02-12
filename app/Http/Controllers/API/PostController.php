@@ -35,7 +35,7 @@ class PostController extends APIController
 
     public function store(CreatePostRequest $request): JsonResponse
     {
-        $post = Post::create($request->validated());
+        $post = Post::create(['user_id' => auth()->id()] + $request->validated());
 
         return $this->responseCreated('Post created successfully', new PostResource($post));
     }
