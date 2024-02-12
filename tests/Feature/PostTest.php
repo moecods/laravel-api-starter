@@ -18,14 +18,18 @@ it('can create a post', function () use ($endpoint) {
         ->assertStatus(201)
         ->assertSee($payload['title']);
 
-    $this->assertDatabaseHas('posts', ['id' => 1]);
+    $this->assertDatabaseHas('posts', ['id' => 1, 'user_id' => $user->id]);
 });
 
 it('can view all posts successfully', function () use ($endpoint) {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    Post::factory(5)->create();
+    Post::factory(5)->create(function ($post) {
+        $post['user_id'] = User::factory()->create()->id;
+
+        return $post;
+    });
 
     $this->getJson($endpoint)
         ->assertStatus(200)
@@ -37,8 +41,13 @@ it('can view all posts by title filter', function () use ($endpoint) {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    Post::factory(5)->create();
-    Post::factory()->create(['title' => 'test']);
+    Post::factory(5)->create(function ($post) {
+        $post['user_id'] = User::factory()->create()->id;
+
+        return $post;
+    });
+
+    Post::factory()->for(User::factory())->create(['title' => 'test']);
 
     $this->getJson($endpoint, ['title' => 'test'])
         ->assertStatus(200)
@@ -50,7 +59,7 @@ it('validates post creation', function () use ($endpoint) {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $data = Post::factory()->raw(['title' => '']);
+    $data = Post::factory()->for(User::factory())->raw(['title' => '']);
 
     $this->postJson($endpoint, $data)
         ->assertStatus(422);
@@ -60,7 +69,7 @@ it('can view post data', function () use ($endpoint) {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $post = Post::factory()->create();
+    $post = Post::factory()->for(User::factory())->create();
 
     $this->getJson($endpoint."/{$post->id}")
         ->assertSee(Post::first()->title)
@@ -71,7 +80,7 @@ it('can update a post', function () use ($endpoint) {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $post = Post::factory()->create();
+    $post = Post::factory()->for(User::factory())->create();
 
     $payload = [
         'title' => 'Random',
@@ -88,7 +97,7 @@ it('can delete a post', function () use ($endpoint) {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $post = Post::factory()->create();
+    $post = Post::factory()->for(User::factory())->create();
 
     $this->deleteJson($endpoint."/{$post->id}")
         ->assertStatus(204);
