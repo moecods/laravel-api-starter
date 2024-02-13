@@ -17,6 +17,7 @@
         "laravel/tinker": "^2.8",
         "phpmailer/phpmailer": "^6.9",
         "prettus/l5-repository": "^2.9",
+        "qirolab/laravel-reactions": "^2.7",
         "spatie/laravel-permission": "^6.2"
     },
     "require-dev": {

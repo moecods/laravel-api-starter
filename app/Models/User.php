@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Qirolab\Laravel\Reactions\Contracts\ReactsInterface;
+use Qirolab\Laravel\Reactions\Traits\Reacts;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
@@ -15,9 +17,9 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string $name
  * @property string $email
  */
-class User extends Authenticatable
+class User extends Authenticatable implements ReactsInterface
 {
-    use Filterable, HasApiTokens, HasFactory, HasRoles, Notifiable;
+    use Filterable, HasApiTokens, HasFactory, HasRoles, Notifiable, Reacts;
 
     protected string $default_filters = UserFilters::class;
 

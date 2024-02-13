@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\PostController;
+use App\Http\Controllers\API\PostReactionController;
 use App\Http\Controllers\API\RoleController;
 use App\Http\Controllers\API\UserController;
 use App\Models\User;
@@ -59,4 +60,6 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::apiResource('roles', RoleController::class)->except('show');
     Route::apiResource('/posts', PostController::class);
 
+    Route::post('posts/{post}/like', [PostReactionController::class, 'like'])->name('posts.like');
+    Route::post('posts/{post}/dislike', [PostReactionController::class, 'dislike'])->name('posts.dislike');
 });
